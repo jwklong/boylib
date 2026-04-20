@@ -3,6 +3,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 project(Asteroids VERSION 1.0 LANGUAGES CXX)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(libs)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -82,7 +84,7 @@ if (WIN32)
     add_custom_command(TARGET Asteroids POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             ${DLL_PATHS}
-            "$<TARGET_FILE_DIR:Asteroids>"
+            ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
         COMMENT "Copying runtime DLLs..."
     )
 endif()
