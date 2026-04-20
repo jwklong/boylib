@@ -8,9 +8,9 @@ add_subdirectory(libs)
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_custom_target(ADD_RESOURCES ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
     ${PROJECT_SOURCE_DIR}/res
-    ${PROJECT_BINARY_DIR}/res
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/res
     COMMENT "Adding resources to build...")
 
 add_executable(Asteroids ${SOURCES})
