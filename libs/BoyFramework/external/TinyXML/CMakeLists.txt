@@ -1,0 +1,8 @@
+project(TinyXML VERSION 2.6.2 LANGUAGES CXX)
+
+file(GLOB_RECURSE TINYXML_SOURCES "*.cpp")
+add_library(TinyXML STATIC ${TINYXML_SOURCES})
+
+target_include_directories(TinyXML PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
