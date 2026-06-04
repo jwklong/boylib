@@ -93,8 +93,8 @@ void Environment::init(Boy::Game *game,
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	int videoFlags = SDL_WINDOW_OPENGL;
-	if (fullscreen) videoFlags |= SDL_WINDOW_FULLSCREEN;
+	int videoFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+	if (fullscreen) videoFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     mWindow = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screenWidth, screenHeight, videoFlags);
     if (mWindow == NULL)
     {
@@ -200,10 +200,17 @@ void Environment::startMainLoop()
         while (SDL_PollEvent(&event)) {
 			switch (event.type) {
 				case SDL_WINDOWEVENT:
-					if (event.window.event == SDL_WINDOWEVENT_ENTER) {
-						mMice[0]->fireEnterEvent();
-					} else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
-						mMice[0]->fireLeaveEvent();
+					switch (event.window.event) {
+						case SDL_WINDOWEVENT_RESIZED:
+						case SDL_WINDOWEVENT_SIZE_CHANGED:
+							setupGL();
+							break;
+						case SDL_WINDOWEVENT_ENTER:
+							mMice[0]->fireEnterEvent();
+							break;
+						case SDL_WINDOWEVENT_LEAVE:
+							mMice[0]->fireLeaveEvent();
+							break;
 					}
 					break;
 				case SDL_KEYUP:
@@ -338,7 +345,7 @@ bool Environment::isFullScreen()
 	}
 	
 	Uint32 flags = SDL_GetWindowFlags(mWindow);
-    if (flags & SDL_WINDOW_FULLSCREEN) {
+    if (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) {
         return true;
     }
     return false;
@@ -351,7 +358,7 @@ void Environment::toggleFullScreen()
 		return;
 	}
 
-	SDL_SetWindowFullscreen(mWindow, isFullScreen() ? 0 : SDL_WINDOW_FULLSCREEN);
+	SDL_SetWindowFullscreen(mWindow, isFullScreen() ? 0 : SDL_WINDOW_FULLSCREEN_DESKTOP);
 
 	setupGL();
 
@@ -360,13 +367,32 @@ void Environment::toggleFullScreen()
 
 void Environment::setupGL()
 {
-	int w;
-	int h;
-	SDL_GetWindowSize(mWindow, &w, &h);
+	int sW = screenWidth();
+	int sH = screenHeight();
+	int wW;
+	int wH;
+	SDL_GetWindowSize(mWindow, &wW, &wH);
 
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, w, h, 0.0, 1.0, -1.0);
+    glOrtho(0.0, sW, sH, 0.0, 1.0, -1.0);
+
+	float screenAspect = (float)sW / (float)sH;
+	float windowAspect = (float)wW / (float)wH;
+	int vX = 0;
+	int vY = 0;
+	int vW = wW;
+	int vH = wH;
+	if (screenAspect < windowAspect)
+	{
+		vW = (int)(vH * screenAspect);
+		vX = (wW - vW) / 2;
+	} else {
+		vH = (int)(vW / screenAspect);
+		vY = (wH - vH) / 2;
+	}
+	glViewport(vX, vY, vW, vH);
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     mGraphics->setClearColor(0xff000000);
