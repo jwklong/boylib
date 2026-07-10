@@ -43,6 +43,7 @@ namespace Boy
 		void startMainLoop();
 		void stopMainLoop();
 		bool isShuttingDown();
+        	void showError(const std::string &message);
 
 		bool isFullScreen();
 		void toggleFullScreen();

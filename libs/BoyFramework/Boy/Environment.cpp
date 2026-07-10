@@ -8,6 +8,7 @@
 #include "SDL2/SDL_opengl.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
+#include "SDL2/SDL_messagebox.h"
 #include "GL/gl.h"
 #include "Game.h"
 #include "GamePad.h"
@@ -397,6 +398,11 @@ void Environment::stopMainLoop()
 bool Environment::isShuttingDown()
 {
 	return mShutdownRequested;
+}
+
+void Environment::showError(const std::string &message)
+{
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"Message from World of Goo Corporation",message.c_str(),mWindow);
 }
 
 bool Environment::isFullScreen()
