@@ -55,8 +55,8 @@ private:
 	std::vector<Explosion*> mExplosions;
 
 	bool mThrust;
-	bool mLeft;
-	bool mRight;
+	float mLeft;
+	float mRight;
 	bool mGunArmed;
 
 	int mLevel;

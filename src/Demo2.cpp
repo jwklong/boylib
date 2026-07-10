@@ -1,5 +1,6 @@
 #include "Demo2.h"
 
+#include <algorithm>
 #include <assert.h>
 #include "Body.h"
 #include "Boy/Environment.h"
@@ -144,6 +145,31 @@ void Demo2::nextLevel()
 
 void Demo2::update(float dt)
 {
+	// gamepad!!
+	Boy::GamePad *pad = Boy::Environment::instance()->getGamePad(0);
+	if (pad->isConnected())
+	{
+		mLeft = std::max(0.0f, -pad->getAnalogL().x);
+		mRight = std::max(0.0f, pad->getAnalogL().x);
+
+		if (pad->getTriggerL() > 0.5f && mGunArmed && !mGameOver && mShip!=NULL)
+		{
+			// add a bullet:
+			BoyLib::Vector2 vel = rotate(BoyLib::Vector2(0.0f,-BULLET_SPEED),-deg2rad(mShip->mRot));
+			mBullets.push_back(new Body(BULLET, mShip->mPos.x, mShip->mPos.y, vel.x, vel.y));
+
+			// make a sound:
+			Boy::Environment::playSound("SOUND_FIRE");
+
+			// gun is no longer armed:
+			mGunArmed = false;
+		}
+		else if (pad->getTriggerL() < 0.2f)
+		{
+			mGunArmed = true;
+		}
+	}
+
 	Boy::Graphics *g = Boy::Environment::instance()->getGraphics();
 	float w = (float)g->getWidth();
 	float h = (float)g->getHeight();
@@ -154,18 +180,7 @@ void Demo2::update(float dt)
 		mShip->update(dt);
 
 		// turn the ship:
-		if (mLeft && !mRight)
-		{
-			mShip->mRotVel = SHIP_ROT_SPEED;
-		}
-		else if (mRight && !mLeft)
-		{
-			mShip->mRotVel = -SHIP_ROT_SPEED;
-		}
-		else
-		{
-			mShip->mRotVel = 0;
-		}
+		mShip->mRotVel = SHIP_ROT_SPEED * (mLeft - mRight);
 
 		// accelerate:
 		if (mThrust)
@@ -377,10 +392,10 @@ void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifi
 	switch (key)
 	{
 		case Boy::Keyboard::KEY_LEFT:
-			mLeft = false;
+			mLeft = 0;
 			break;
 		case Boy::Keyboard::KEY_RIGHT:
-			mRight = false;
+			mRight = 0;
 			break;
 		case Boy::Keyboard::KEY_UP:
 			mThrust = false;
@@ -400,18 +415,9 @@ void Demo2::gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button)
 {
 	switch (button)
 	{
-		case Boy::GamePad::BUTTON_DPAD_LEFT:
-			mLeft = false;
-			break;
-		case Boy::GamePad::BUTTON_DPAD_RIGHT:
-			mRight = false;
-			break;
 		case Boy::GamePad::BUTTON_0:
 			mThrust = false;
 			Boy::Environment::instance()->getSoundPlayer()->stopSound(mThrustSound);
-			break;
-		case Boy::GamePad::BUTTON_1:
-			mGunArmed = true;
 			break;
 	}
 }
@@ -425,10 +431,10 @@ void Demo2::keyDown(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modi
 			Boy::Environment::instance()->stopMainLoop();
 			break;
 		case Boy::Keyboard::KEY_LEFT:
-			mLeft = true;
+			mLeft = 1;
 			break;
 		case Boy::Keyboard::KEY_RIGHT:
-			mRight = true;
+			mRight = 1;
 			break;
 		case Boy::Keyboard::KEY_UP:
 			mThrust = true;
@@ -460,12 +466,6 @@ void Demo2::gamePadButtonDown(Boy::GamePad *pad, Boy::GamePad::Button button)
 {
 	switch (button)
 	{
-		case Boy::GamePad::BUTTON_DPAD_LEFT:
-			mLeft = true;
-			break;
-		case Boy::GamePad::BUTTON_DPAD_RIGHT:
-			mRight = true;
-			break;
 		case Boy::GamePad::BUTTON_0:
 			mThrust = true;
 			Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
@@ -475,17 +475,6 @@ void Demo2::gamePadButtonDown(Boy::GamePad *pad, Boy::GamePad::Button button)
 			{
 				newGame();
 			}
-			break;
-		case Boy::GamePad::BUTTON_1:
-			// add a bullet:
-			BoyLib::Vector2 vel = rotate(BoyLib::Vector2(0.0f,-BULLET_SPEED),-deg2rad(mShip->mRot));
-			mBullets.push_back(new Body(BULLET, mShip->mPos.x, mShip->mPos.y, vel.x, vel.y));
-
-			// make a sound:
-			Boy::Environment::playSound("SOUND_FIRE");
-
-			// gun is no longer armed:
-			mGunArmed = false;
 			break;
 	}
 }
