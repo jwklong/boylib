@@ -1,5 +1,6 @@
 #include "Environment.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 #include <cctype>
@@ -9,6 +10,7 @@
 #include "SDL2/SDL_mixer.h"
 #include "GL/gl.h"
 #include "Game.h"
+#include "GamePad.h"
 #include "Graphics.h"
 #include "ResourceLoader.h"
 #include "ResourceManager.h"
@@ -72,7 +74,7 @@ void Environment::init(Boy::Game *game,
 	mSoundPlayer = new SoundPlayer();
 	mPersistenceLayer = new PersistenceLayer(persFile);
 
-    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) == -1) { 
+    if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER) == -1) { 
         printf("Could not initialize SDL: %s\n", SDL_GetError());
         exit(1);
     }
@@ -144,6 +146,12 @@ void Environment::init(Boy::Game *game,
 	mKeyboard = new Keyboard();
 	mKeyboard->setConnected(true);
 
+	// gamepad
+	for (int i=0 ; i<GAMEPAD_COUNT_MAX ; i++)
+	{
+		mGamePads[i] = new GamePad(i);
+	}
+
 	mFullScreenToggleDisableCount = 0;
 }
 
@@ -156,6 +164,10 @@ void Environment::destroy()
 		delete mMice[i]; mMice[i] = NULL;
 	}
 	delete mKeyboard; mKeyboard = NULL;
+	for (int i=0 ; i<GAMEPAD_COUNT_MAX ; i++)
+	{
+		delete mGamePads[i]; mGamePads[i] = NULL;
+	}
 
 	delete mGraphics; mGraphics = NULL;
 	delete mPersistenceLayer; mPersistenceLayer = NULL;
@@ -199,20 +211,63 @@ void Environment::startMainLoop()
 		int scrollDelta = 0;
         while (SDL_PollEvent(&event)) {
 			switch (event.type) {
-				case SDL_WINDOWEVENT:
-					switch (event.window.event) {
-						case SDL_WINDOWEVENT_RESIZED:
-						case SDL_WINDOWEVENT_SIZE_CHANGED:
-							setupGL();
-							break;
-						case SDL_WINDOWEVENT_ENTER:
-							mMice[0]->fireEnterEvent();
-							break;
-						case SDL_WINDOWEVENT_LEAVE:
-							mMice[0]->fireLeaveEvent();
-							break;
+				case SDL_CONTROLLERAXISMOTION: {
+					float value = event.caxis.value / 32768.0f;
+					int i = mInstanceIdToGamePadId[event.cdevice.which];
+					switch (event.caxis.axis) { // analog y is inverted for some reason
+						case SDL_CONTROLLER_AXIS_LEFTX: mGamePads[i]->setAnalogLX(value); break;
+						case SDL_CONTROLLER_AXIS_LEFTY: mGamePads[i]->setAnalogLY(-value); break;
+						case SDL_CONTROLLER_AXIS_RIGHTX: mGamePads[i]->setAnalogRX(value); break;
+						case SDL_CONTROLLER_AXIS_RIGHTY: mGamePads[i]->setAnalogRY(-value); break;
+						case SDL_CONTROLLER_AXIS_TRIGGERLEFT: mGamePads[i]->setTriggerL(value); break;
+						case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: mGamePads[i]->setTriggerR(value); break;
 					}
 					break;
+				}
+				case SDL_CONTROLLERBUTTONUP:
+				case SDL_CONTROLLERBUTTONDOWN: {
+					bool down = event.type == SDL_CONTROLLERBUTTONDOWN;
+
+					GamePad::Button button = GamePad::BUTTON_UNKNOWN;
+					switch (event.cbutton.button) {
+						case SDL_CONTROLLER_BUTTON_A: button = GamePad::BUTTON_0; break;
+						case SDL_CONTROLLER_BUTTON_B: button = GamePad::BUTTON_1; break;
+						case SDL_CONTROLLER_BUTTON_X: button = GamePad::BUTTON_2; break;
+						case SDL_CONTROLLER_BUTTON_Y: button = GamePad::BUTTON_3; break;
+						case SDL_CONTROLLER_BUTTON_LEFTSHOULDER: button = GamePad::BUTTON_L_SHOULDER; break;
+						case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER: button = GamePad::BUTTON_R_SHOULDER; break;
+						case SDL_CONTROLLER_BUTTON_LEFTSTICK: button = GamePad::BUTTON_L_STICK; break;
+						case SDL_CONTROLLER_BUTTON_RIGHTSTICK: button = GamePad::BUTTON_R_STICK; break;
+						case SDL_CONTROLLER_BUTTON_START: button = GamePad::BUTTON_START; break;
+						case SDL_CONTROLLER_BUTTON_BACK: button = GamePad::BUTTON_AUX; break;
+						case SDL_CONTROLLER_BUTTON_DPAD_UP: button = GamePad::BUTTON_DPAD_UP; break;
+						case SDL_CONTROLLER_BUTTON_DPAD_DOWN: button = GamePad::BUTTON_DPAD_DOWN; break;
+						case SDL_CONTROLLER_BUTTON_DPAD_LEFT: button = GamePad::BUTTON_DPAD_LEFT; break;
+						case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: button = GamePad::BUTTON_DPAD_RIGHT; break;
+					}
+
+					int i = mInstanceIdToGamePadId[event.cdevice.which];
+					mGamePads[i]->setButtonDown(button, down);
+					break;
+				}
+				case SDL_CONTROLLERDEVICEADDED: {
+					SDL_GameController* controller = SDL_GameControllerOpen(event.cdevice.which);
+					SDL_JoystickID instanceID = SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller));
+					for (int i=0 ; i<GAMEPAD_COUNT_MAX ; i++) {
+						if (!mGamePads[i]->isConnected()) {
+							mGamePads[i]->setConnected(true);
+							mInstanceIdToGamePadId[instanceID] = i;
+							break;
+						}
+					}
+					break;
+				}
+				case SDL_CONTROLLERDEVICEREMOVED: {
+					int i = mInstanceIdToGamePadId[event.cdevice.which];
+					mInstanceIdToGamePadId.erase(event.cdevice.which);
+					mGamePads[i]->setConnected(false);
+					break;
+				}
 				case SDL_KEYUP:
 				case SDL_KEYDOWN: {
 					if (event.key.repeat) break;
@@ -237,25 +292,15 @@ void Environment::startMainLoop()
 
 					break;
 				}
-				case SDL_MOUSEWHEEL:
-					scrollDelta += event.wheel.y;
-					break;
 				case SDL_MOUSEBUTTONUP:
 				case SDL_MOUSEBUTTONDOWN: {
 					bool down = event.type == SDL_MOUSEBUTTONDOWN;
 
 					Mouse::Button button = Mouse::BUTTON_UNKNOWN;
 					switch (event.button.button) {
-						case SDL_BUTTON_LEFT:
-							button = Mouse::BUTTON_LEFT;
-							break;
-						case SDL_BUTTON_MIDDLE:
-							button = Mouse::BUTTON_MIDDLE;
-							break;
-						case SDL_BUTTON_RIGHT:
-							button = Mouse::BUTTON_RIGHT;
-							break;
-
+						case SDL_BUTTON_LEFT: button = Mouse::BUTTON_LEFT; break;
+						case SDL_BUTTON_MIDDLE: button = Mouse::BUTTON_MIDDLE; break;
+						case SDL_BUTTON_RIGHT: button = Mouse::BUTTON_RIGHT; break;
 					}
 
 					if (down) {
@@ -269,8 +314,25 @@ void Environment::startMainLoop()
 				case SDL_MOUSEMOTION:
 					mMice[0]->fireMoveEvent(event.motion.x, event.motion.y);
 					break;
+				case SDL_MOUSEWHEEL:
+					scrollDelta += event.wheel.y;
+					break;
 				case SDL_QUIT:
 					mShutdownRequested = true;
+					break;
+				case SDL_WINDOWEVENT:
+					switch (event.window.event) {
+						case SDL_WINDOWEVENT_RESIZED:
+						case SDL_WINDOWEVENT_SIZE_CHANGED:
+							setupGL();
+							break;
+						case SDL_WINDOWEVENT_ENTER:
+							mMice[0]->fireEnterEvent();
+							break;
+						case SDL_WINDOWEVENT_LEAVE:
+							mMice[0]->fireLeaveEvent();
+							break;
+					}
 					break;
 			}
         }
@@ -462,6 +524,50 @@ int Environment::getKeyboardCount()
 Keyboard *Environment::getKeyboard(int i)
 {
 	return mKeyboard;
+}
+
+int Environment::getGamePadCount()
+{
+	return GAMEPAD_COUNT_MAX;
+}
+
+GamePad *Environment::getGamePad(int i)
+{
+	assert(i<GAMEPAD_COUNT_MAX);
+	return mGamePads[i];
+}
+
+void Environment::fireGamePadAdded(int gamePadId)
+{
+	if (mGame!=NULL)
+	{
+		mGame->handleGamePadAdded(gamePadId);
+	}
+}
+
+void Environment::fireGamePadRemoved(int gamePadId)
+{
+	if (mGame!=NULL)
+	{
+		mGame->handleGamePadRemoved(gamePadId);
+	}
+}
+
+void Environment::vibrateGamePad(int gamePadId, int left, int right)
+{
+	SDL_JoystickID instanceId = -1;
+	for (const auto& [k, v] : mInstanceIdToGamePadId)
+	{
+		if (v == gamePadId)
+		{
+			instanceId = k;
+			break;
+		}
+	}
+	assert(instanceId != -1);
+
+	SDL_GameController *controller = SDL_GameControllerFromInstanceID(instanceId);
+	SDL_GameControllerRumble(controller, left, right, 0xffffffff); // duration should be indefinite. vibration can be stopped by setting left and right to 0
 }
 
 float Environment::getTime()

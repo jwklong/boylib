@@ -4,6 +4,7 @@
 #include "Boy/Environment.h"
 #include "Boy/Font.h"
 #include "Boy/Game.h"
+#include "Boy/GamePadListener.h"
 #include "Boy/Graphics.h"
 #include "Boy/Sound.h"
 #include "Boy/KeyboardListener.h"
@@ -11,7 +12,7 @@
 #include "BoyLib/Vector2.h"
 #include "Explosion.h"
 
-class Demo2: public Boy::Game, public Boy::KeyboardListener
+class Demo2: public Boy::Game, public Boy::KeyboardListener, public Boy::GamePadListener
 {
 public:
 
@@ -33,6 +34,10 @@ public:
 	virtual void keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifiers mods);
 	virtual void keyDown(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifiers mods);
 
+	// implementation of GamePadListener:
+	virtual void gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button);
+	virtual void gamePadButtonDown(Boy::GamePad *pad, Boy::GamePad::Button button);
+
 private:
 
 	void death();
@@ -50,8 +55,8 @@ private:
 	std::vector<Explosion*> mExplosions;
 
 	bool mThrust;
-	bool mLeft;
-	bool mRight;
+	float mLeft;
+	float mRight;
 	bool mGunArmed;
 
 	int mLevel;

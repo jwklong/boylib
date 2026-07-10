@@ -5,22 +5,24 @@
 #include <stdio.h>
 #include "BoyLib/UString.h"
 #include "SDL2/SDL.h"
-#include "Mouse.h"
-#include "Keyboard.h"
 
 #define MOUSE_COUNT_MAX 4
+#define GAMEPAD_COUNT_MAX 4
 
 namespace Boy
 {
 	class Game;
+	class GamePad;
 	class Graphics;
+	class Image;
+	class Keyboard;
+	class Mouse;
 	class PersistenceLayer;
-	class ResourceManager;
 	class ResourceLoader;
+	class ResourceManager;
+	class Sound;
 	class SoundPlayer;
 	class Storage;
-	class Image;
-	class Sound;
 	class TriStrip;
 
 	class Environment
@@ -29,7 +31,7 @@ namespace Boy
 		Environment();
 		virtual ~Environment();
 
-		// static access method:
+		// static access method
 		static Environment *instance();
 
 		// init and destroy
@@ -37,11 +39,11 @@ namespace Boy
 			const char *windowTitle, const BoyLib::UString &persFile);
 		void destroy();
 
+		// main loop related
 		void startMainLoop();
 		void stopMainLoop();
 		bool isShuttingDown();
 
-		
 		bool isFullScreen();
 		void toggleFullScreen();
 		void enableFullScreenToggle();
@@ -56,6 +58,12 @@ namespace Boy
 
 		int getKeyboardCount();
 		Keyboard *getKeyboard(int i);
+
+		int getGamePadCount();
+		GamePad *getGamePad(int i);
+		void fireGamePadAdded(int gamePadId);
+		void fireGamePadRemoved(int gamePadId);
+		void vibrateGamePad(int gamePadId, int leftVal, int rightVal);
 
 		float getTime();
 
@@ -126,6 +134,9 @@ namespace Boy
 		bool mIsLeftMouseButtonDown[MOUSE_COUNT_MAX];
 
 		Keyboard *mKeyboard;
+
+		GamePad *mGamePads[GAMEPAD_COUNT_MAX];
+		std::map<SDL_JoystickID,int> mInstanceIdToGamePadId;
 
 		FILE *mLogFile;
 	};
