@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Body.h"
 #include "Boy/Environment.h"
+#include "Boy/GamePad.h"
 #include "Boy/Graphics.h"
 #include "Boy/Mouse.h"
 #include "Boy/ResourceManager.h"
@@ -39,6 +40,7 @@ Demo2::~Demo2()
 {
 	// stop listening to the keyboard:
 	Boy::Environment::instance()->getKeyboard(0)->removeListener(this);
+	Boy::Environment::instance()->getGamePad(0)->removeListener(this);
 }
 
 Demo2 *Demo2::instance()
@@ -99,8 +101,9 @@ void Demo2::preShutdown()
 
 void Demo2::loadComplete()
 {
-	// start listening to the keyboard:
+	// start listening to the keyboard / gamepad:
 	Boy::Environment::instance()->getKeyboard(0)->addListener(this);
+	Boy::Environment::instance()->getGamePad(0)->addListener(this);
 
 	// set the load complete flag (this will trigger 
 	// the start of the game in the update method):
@@ -373,16 +376,16 @@ void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifi
 {
 	switch (key)
 	{
-	case Boy::Keyboard::KEY_LEFT:
-		mLeft = false;
-		break;
-	case Boy::Keyboard::KEY_RIGHT:
-		mRight = false;
-		break;
-	case Boy::Keyboard::KEY_UP:
-		mThrust = false;
-		Boy::Environment::instance()->getSoundPlayer()->stopSound(mThrustSound);
-		break;
+		case Boy::Keyboard::KEY_LEFT:
+			mLeft = false;
+			break;
+		case Boy::Keyboard::KEY_RIGHT:
+			mRight = false;
+			break;
+		case Boy::Keyboard::KEY_UP:
+			mThrust = false;
+			Boy::Environment::instance()->getSoundPlayer()->stopSound(mThrustSound);
+			break;
 	}
 
 	// when spacebar is hit:
@@ -393,29 +396,49 @@ void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifi
 	}
 }
 
+void Demo2::gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button)
+{
+	switch (button)
+	{
+		case Boy::GamePad::BUTTON_DPAD_LEFT:
+			mLeft = false;
+			break;
+		case Boy::GamePad::BUTTON_DPAD_RIGHT:
+			mRight = false;
+			break;
+		case Boy::GamePad::BUTTON_0:
+			mThrust = false;
+			Boy::Environment::instance()->getSoundPlayer()->stopSound(mThrustSound);
+			break;
+		case Boy::GamePad::BUTTON_1:
+			mGunArmed = true;
+			break;
+	}
+}
+
 void Demo2::keyDown(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifiers mods)
 {
 	switch (key)
 	{
-	case Boy::Keyboard::KEY_ESCAPE:
-		// on escape, exit game:
-		Boy::Environment::instance()->stopMainLoop();
-		break;
-	case Boy::Keyboard::KEY_LEFT:
-		mLeft = true;
-		break;
-	case Boy::Keyboard::KEY_RIGHT:
-		mRight = true;
-		break;
-	case Boy::Keyboard::KEY_UP:
-		mThrust = true;
-		Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
-		break;
-	case Boy::Keyboard::KEY_RETURN:
-		if (mGameOver)
-		{
-			newGame();
-		}
+		case Boy::Keyboard::KEY_ESCAPE:
+			// on escape, exit game:
+			Boy::Environment::instance()->stopMainLoop();
+			break;
+		case Boy::Keyboard::KEY_LEFT:
+			mLeft = true;
+			break;
+		case Boy::Keyboard::KEY_RIGHT:
+			mRight = true;
+			break;
+		case Boy::Keyboard::KEY_UP:
+			mThrust = true;
+			Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
+			break;
+		case Boy::Keyboard::KEY_RETURN:
+			if (mGameOver)
+			{
+				newGame();
+			}
 	}
 
 	// when spacebar is hit and the gun is armed:
@@ -430,6 +453,40 @@ void Demo2::keyDown(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modi
 
 		// gun is no longer armed:
 		mGunArmed = false;
+	}
+}
+
+void Demo2::gamePadButtonDown(Boy::GamePad *pad, Boy::GamePad::Button button)
+{
+	switch (button)
+	{
+		case Boy::GamePad::BUTTON_DPAD_LEFT:
+			mLeft = true;
+			break;
+		case Boy::GamePad::BUTTON_DPAD_RIGHT:
+			mRight = true;
+			break;
+		case Boy::GamePad::BUTTON_0:
+			mThrust = true;
+			Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
+			break;
+		case Boy::GamePad::BUTTON_START:
+			if (mGameOver)
+			{
+				newGame();
+			}
+			break;
+		case Boy::GamePad::BUTTON_1:
+			// add a bullet:
+			BoyLib::Vector2 vel = rotate(BoyLib::Vector2(0.0f,-BULLET_SPEED),-deg2rad(mShip->mRot));
+			mBullets.push_back(new Body(BULLET, mShip->mPos.x, mShip->mPos.y, vel.x, vel.y));
+
+			// make a sound:
+			Boy::Environment::playSound("SOUND_FIRE");
+
+			// gun is no longer armed:
+			mGunArmed = false;
+			break;
 	}
 }
 

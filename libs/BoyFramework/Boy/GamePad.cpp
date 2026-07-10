@@ -85,11 +85,12 @@ void GamePad::setConnected(bool connected)
 	// fire notification:
 	if (connected)
 	{
-		envDebugLog("gamepad %d connected \n",mId);
+		envDebugLog("gamepad %d connected\n",mId);
 		Environment::instance()->fireGamePadAdded(mId);
 	}
 	else
 	{
+		envDebugLog("gamepad %d disconnected\n",mId);
 		Environment::instance()->fireGamePadRemoved(mId);
 	}
 }
@@ -120,12 +121,12 @@ void GamePad::setButtonDown(Button button, bool down)
 	mIsButtonDown[button] = down;
 	if (down)
 	{
-		envDebugLog("gamepad %d: button %d down\n",mId,button);
+		// envDebugLog("gamepad %d: button %d down\n",mId,button);
 		fireDownEvent(button);
 	}
 	else
 	{
-		envDebugLog("gamepad %d: button %d up\n",mId,button);
+		// envDebugLog("gamepad %d: button %d up\n",mId,button);
 		fireUpEvent(button);
 	}
 }
@@ -150,12 +151,12 @@ void GamePad::setAnalogL(float x, float y)
 {
 	mAnalogL.x = x;
 	mAnalogL.y = y;
-	envDebugLog("gamepad %d: left stick: (%f, %f)\n",mId,mAnalogL.x,mAnalogL.y);
+	// envDebugLog("gamepad %d: left stick: (%f, %f)\n",mId,mAnalogL.x,mAnalogL.y);
 }
 
 void GamePad::setAnalogR(float x, float y)
 {
 	mAnalogR.x = x;
 	mAnalogR.y = y;
-	envDebugLog("gamepad %d: right stick: (%f, %f)\n",mId,mAnalogR.x,mAnalogR.y);
+	// envDebugLog("gamepad %d: right stick: (%f, %f)\n",mId,mAnalogR.x,mAnalogR.y);
 }
