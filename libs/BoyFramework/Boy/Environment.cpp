@@ -214,11 +214,11 @@ void Environment::startMainLoop()
 				case SDL_CONTROLLERAXISMOTION: {
 					float value = event.caxis.value / 32768.0f;
 					int i = mInstanceIdToGamePadId[event.cdevice.which];
-					switch (event.caxis.axis) {
+					switch (event.caxis.axis) { // analog y is inverted for some reason
 						case SDL_CONTROLLER_AXIS_LEFTX: mGamePads[i]->setAnalogLX(value); break;
-						case SDL_CONTROLLER_AXIS_LEFTY: mGamePads[i]->setAnalogLY(value); break;
+						case SDL_CONTROLLER_AXIS_LEFTY: mGamePads[i]->setAnalogLY(-value); break;
 						case SDL_CONTROLLER_AXIS_RIGHTX: mGamePads[i]->setAnalogRX(value); break;
-						case SDL_CONTROLLER_AXIS_RIGHTY: mGamePads[i]->setAnalogRY(value); break;
+						case SDL_CONTROLLER_AXIS_RIGHTY: mGamePads[i]->setAnalogRY(-value); break;
 						case SDL_CONTROLLER_AXIS_TRIGGERLEFT: mGamePads[i]->setTriggerL(value); break;
 						case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: mGamePads[i]->setTriggerR(value); break;
 					}
