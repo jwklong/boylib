@@ -277,6 +277,11 @@ int Graphics::getTransformStackSize()
 	return (int)mTransformStack.size();
 }
 
+void Graphics::setClipRect(int x, int y, int width, int height)
+{
+    glScissor(x, y, width, height);
+}
+
 int Graphics::getWidth()
 {
     return mWidth;

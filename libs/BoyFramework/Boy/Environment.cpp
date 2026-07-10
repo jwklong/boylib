@@ -466,6 +466,7 @@ void Environment::setupGL()
     mGraphics->setClearColor(0xff000000);
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_SCISSOR_TEST);
 	mGraphics->setDrawMode(Graphics::DRAWMODE_NORMAL);
 	glEnable(GL_MULTISAMPLE);
 

@@ -93,6 +93,8 @@ namespace Boy
 		void setClearZ(float z);
         void setClearColor(Color color);
 
+		void setClipRect(int x, int y, int width, int height);
+
 		int getWidth();
 		int getHeight();
 
