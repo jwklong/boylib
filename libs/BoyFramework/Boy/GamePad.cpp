@@ -80,6 +80,7 @@ void GamePad::setConnected(bool connected)
 	// fire notification:
 	if (connected)
 	{
+		envDebugLog("gamepad %d connected \n",mId);
 		Environment::instance()->fireGamePadAdded(mId);
 	}
 	else
@@ -114,10 +115,12 @@ void GamePad::setButtonDown(Button button, bool down)
 	mIsButtonDown[button] = down;
 	if (down)
 	{
+		envDebugLog("gamepad %d: button %d down\n",mId,button);
 		fireDownEvent(button);
 	}
 	else
 	{
+		envDebugLog("gamepad %d: button %d up\n",mId,button);
 		fireUpEvent(button);
 	}
 }
