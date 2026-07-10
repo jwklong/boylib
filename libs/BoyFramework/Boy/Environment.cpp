@@ -1,5 +1,6 @@
 #include "Environment.h"
 
+#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 #include <cctype>
@@ -213,9 +214,14 @@ void Environment::startMainLoop()
 				case SDL_CONTROLLERAXISMOTION: {
 					float value = event.caxis.value / 32768.0f;
 					int i = mInstanceIdToGamePadId[event.cdevice.which];
-					/*switch (event.caxis.axis) {
-
-					}*/
+					switch (event.caxis.axis) {
+						case SDL_CONTROLLER_AXIS_LEFTX: mGamePads[i]->setAnalogLX(value); break;
+						case SDL_CONTROLLER_AXIS_LEFTY: mGamePads[i]->setAnalogLY(value); break;
+						case SDL_CONTROLLER_AXIS_RIGHTX: mGamePads[i]->setAnalogRX(value); break;
+						case SDL_CONTROLLER_AXIS_RIGHTY: mGamePads[i]->setAnalogRY(value); break;
+						case SDL_CONTROLLER_AXIS_TRIGGERLEFT: mGamePads[i]->setTriggerL(value); break;
+						case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: mGamePads[i]->setTriggerR(value); break;
+					}
 					break;
 				}
 				case SDL_CONTROLLERBUTTONUP:
@@ -545,6 +551,23 @@ void Environment::fireGamePadRemoved(int gamePadId)
 	{
 		mGame->handleGamePadRemoved(gamePadId);
 	}
+}
+
+void Environment::vibrateGamePad(int gamePadId, int left, int right)
+{
+	SDL_JoystickID instanceId = -1;
+	for (const auto& [k, v] : mInstanceIdToGamePadId)
+	{
+		if (v == gamePadId)
+		{
+			instanceId = k;
+			break;
+		}
+	}
+	assert(instanceId != -1);
+
+	SDL_GameController *controller = SDL_GameControllerFromInstanceID(instanceId);
+	SDL_GameControllerRumble(controller, left, right, 0xffffffff); // duration should be indefinite. vibration can be stopped by setting left and right to 0
 }
 
 float Environment::getTime()

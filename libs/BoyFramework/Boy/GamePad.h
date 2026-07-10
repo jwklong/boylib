@@ -40,11 +40,17 @@ namespace Boy
 		const BoyLib::Vector2 &getAnalogL();
 		const BoyLib::Vector2 &getAnalogR();
 		void setAnalogL(float x, float y);
+		void setAnalogLX(float x) { setAnalogL(x, mAnalogL.y); };
+		void setAnalogLY(float y) { setAnalogL(mAnalogL.x, y); };
 		void setAnalogR(float x, float y);
+		void setAnalogRX(float x) { setAnalogR(x, mAnalogR.y); };
+		void setAnalogRY(float y) { setAnalogR(mAnalogR.x, y); };
 
 		float getTriggerL();
 		float getTriggerR();
 		void setTriggers(float l, float r);
+		void setTriggerL(float l) { setTriggers(l, mTriggerR); };
+		void setTriggerR(float r) { setTriggers(mTriggerL, r); };
 
 		void setButtonDown(Button button, bool down);
 		bool isButtonDown(Button button);

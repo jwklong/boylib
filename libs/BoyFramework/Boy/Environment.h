@@ -63,6 +63,7 @@ namespace Boy
 		GamePad *getGamePad(int i);
 		void fireGamePadAdded(int gamePadId);
 		void fireGamePadRemoved(int gamePadId);
+		void vibrateGamePad(int gamePadId, int leftVal, int rightVal);
 
 		float getTime();
 

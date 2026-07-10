@@ -23,6 +23,11 @@ GamePad::~GamePad()
 {
 }
 
+void GamePad::vibrate(int left, int right)
+{
+	Environment::instance()->vibrateGamePad(mId, left, right);
+}
+
 void GamePad::addListener(GamePadListener *listener)
 {
 	assert(find(mListeners.begin(),mListeners.end(),listener) == mListeners.end());
@@ -145,10 +150,12 @@ void GamePad::setAnalogL(float x, float y)
 {
 	mAnalogL.x = x;
 	mAnalogL.y = y;
+	envDebugLog("gamepad %d: left stick: (%f, %f)\n",mId,mAnalogL.x,mAnalogL.y);
 }
 
 void GamePad::setAnalogR(float x, float y)
 {
 	mAnalogR.x = x;
 	mAnalogR.y = y;
+	envDebugLog("gamepad %d: right stick: (%f, %f)\n",mId,mAnalogR.x,mAnalogR.y);
 }
