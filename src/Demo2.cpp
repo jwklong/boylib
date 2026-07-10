@@ -415,8 +415,6 @@ void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifi
 
 void Demo2::gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button)
 {
-	if (Boy::Environment::instance()->getGamePad(0)->isConnected()) return;
-
 	switch (button)
 	{
 		case Boy::GamePad::BUTTON_0:
@@ -428,6 +426,8 @@ void Demo2::gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button)
 
 void Demo2::keyDown(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifiers mods)
 {
+	if (Boy::Environment::instance()->getGamePad(0)->isConnected()) return;
+
 	switch (key)
 	{
 		case Boy::Keyboard::KEY_ESCAPE:
