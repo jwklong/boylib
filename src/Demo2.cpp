@@ -164,7 +164,7 @@ void Demo2::update(float dt)
 			// gun is no longer armed:
 			mGunArmed = false;
 		}
-		else if (pad->getTriggerL() < 0.2f)
+		else if (pad->getTriggerR() < 0.2f)
 		{
 			mGunArmed = true;
 		}
@@ -372,7 +372,7 @@ void Demo2::draw(Boy::Graphics *g)
 	if (mGameOver)
 	{
 		BoyLib::UString str1("GAME OVER");
-		BoyLib::UString str2("press ENTER to restart");
+		BoyLib::UString str2(Boy::Environment::instance()->getGamePad(0)->isConnected() ? "press A to restart" : "press ENTER to restart");
 		float str2scale = 0.5f;
 		float x1 = (Boy::Environment::screenWidth() - mFont->getStringWidth(str1)) / 2.0f;
 		float x2 = (Boy::Environment::screenWidth() - mFont->getStringWidth(str2)*str2scale) / 2.0f;
@@ -471,13 +471,14 @@ void Demo2::gamePadButtonDown(Boy::GamePad *pad, Boy::GamePad::Button button)
 	switch (button)
 	{
 		case Boy::GamePad::BUTTON_0:
-			mThrust = true;
-			Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
-			break;
-		case Boy::GamePad::BUTTON_START:
 			if (mGameOver)
 			{
 				newGame();
+			}
+			else
+			{
+				mThrust = true;
+				Boy::Environment::instance()->getSoundPlayer()->playSound(mThrustSound,1,true);
 			}
 			break;
 	}
