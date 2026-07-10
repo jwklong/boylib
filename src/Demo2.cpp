@@ -152,7 +152,7 @@ void Demo2::update(float dt)
 		mLeft = std::max(0.0f, -pad->getAnalogL().x);
 		mRight = std::max(0.0f, pad->getAnalogL().x);
 
-		if (pad->getTriggerL() > 0.5f && mGunArmed && !mGameOver && mShip!=NULL)
+		if (pad->getTriggerR() > 0.5f && mGunArmed && !mGameOver && mShip!=NULL)
 		{
 			// add a bullet:
 			BoyLib::Vector2 vel = rotate(BoyLib::Vector2(0.0f,-BULLET_SPEED),-deg2rad(mShip->mRot));
@@ -389,6 +389,8 @@ void Demo2::draw(Boy::Graphics *g)
 
 void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifiers mods)
 {
+	if (Boy::Environment::instance()->getGamePad(0)->isConnected()) return;
+
 	switch (key)
 	{
 		case Boy::Keyboard::KEY_LEFT:
@@ -413,6 +415,8 @@ void Demo2::keyUp(wchar_t unicode, Boy::Keyboard::Key key, Boy::Keyboard::Modifi
 
 void Demo2::gamePadButtonUp(Boy::GamePad *pad, Boy::GamePad::Button button)
 {
+	if (Boy::Environment::instance()->getGamePad(0)->isConnected()) return;
+
 	switch (button)
 	{
 		case Boy::GamePad::BUTTON_0:
