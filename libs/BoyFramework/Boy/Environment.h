@@ -91,6 +91,7 @@ namespace Boy
 		unsigned char *getCryptoKey();
 
 		void debugLog(const char *fmt, ...);
+		void setLogFile(FILE *logFile);
 	protected:
 		void update();
 		void draw();

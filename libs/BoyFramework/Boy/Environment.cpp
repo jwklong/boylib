@@ -747,3 +747,8 @@ void Environment::debugLog(const char *fmt, ...)
 	}
 #endif
 }
+
+void Environment::setLogFile(FILE *logFile)
+{
+	mLogFile = logFile;
+}
