@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <filesystem>
+#include "Crypto.h"
 #include "Storage.h"
 #include "Environment.h"
 #include "BoyLib/BoyUtil.h"
@@ -13,8 +14,10 @@
 
 using namespace Boy;
 
-PersistenceLayer::PersistenceLayer(const BoyLib::UString &filename)
+PersistenceLayer::PersistenceLayer(const BoyLib::UString &filename, unsigned char *key)
 {
+	mKey = key;
+
     #ifdef _WIN32
         wchar_t buffer[MAX_PATH];
         HRESULT result = SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, buffer);
@@ -103,7 +106,11 @@ void PersistenceLayer::load()
 		assert( result == Storage::STORAGE_OK );
 		pStorage->FileClose( hFile );
 
-		parse(data, size);
+		char *decData;
+		int decSize;
+		Boy::aesDecrypt(mKey,data,size,&decData,&decSize);
+
+		parse(decData, decSize);
 
 		delete[] data;
 	}
@@ -128,12 +135,18 @@ void PersistenceLayer::save()
 	// mark the end of the data:
 	writeStr << ",0.";
 
+	// decrypt data into output data buffer:
+	int size = (int)writeStr.str().size();
+	int encSize;
+	char *encData;
+	Boy::aesEncrypt(mKey, writeStr.str().c_str(), size, &encData, &encSize);
+
 	// write to file:
 	BoyFileHandle hFile;
 	Storage *pStorage = Environment::instance()->getStorage();
 	Storage::StorageResult result = pStorage->FileOpen( mFileName.toUtf8(), Storage::STORAGE_MODE_WRITE | Storage::STORAGE_OPEN_ALWAYS, &hFile );
 	assert( result == Storage::STORAGE_OK );
-	result = pStorage->FileWrite( hFile, writeStr.str().c_str(), (int)writeStr.str().size());
+	result = pStorage->FileWrite( hFile, encData, encSize );
 	assert( result == Storage::STORAGE_OK );
 	pStorage->FileClose( hFile );
 }

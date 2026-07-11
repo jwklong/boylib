@@ -12,7 +12,8 @@ int main(int argc, char* args[]) {
         600, // height
 		false, // fullscreen
 		"Asteroids (v1.0)", // window title
-		"demo1.dat"); // persistence layer file name
+		"demo1.dat", // persistence layer file name
+		NULL); // no encryption
 
     Boy::Environment::instance()->startMainLoop();
 

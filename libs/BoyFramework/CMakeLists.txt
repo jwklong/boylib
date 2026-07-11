@@ -24,9 +24,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if (WIN32)
-    target_link_libraries(BoyFramework PRIVATE SDL2::SDL2-static SDL2_image::SDL2_image-static SDL2_mixer::SDL2_mixer-static OpenGL::GL TinyXML)
+    target_link_libraries(BoyFramework PRIVATE SDL2::SDL2-static SDL2_image::SDL2_image-static SDL2_mixer::SDL2_mixer-static OpenGL::GL AES TinyXML)
 else()
-    target_link_libraries(BoyFramework PRIVATE SDL2 SDL2_image SDL2_mixer OpenGL::GL TinyXML)
+    target_link_libraries(BoyFramework PRIVATE SDL2 SDL2_image SDL2_mixer OpenGL::GL AES TinyXML)
 endif()
 
 add_subdirectory(external)

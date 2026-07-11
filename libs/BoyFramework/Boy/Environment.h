@@ -36,7 +36,7 @@ namespace Boy
 
 		// init and destroy
 		void init(Game *game, int screenWidth, int screenHeight, bool fullscreen, 
-			const char *windowTitle, const BoyLib::UString &persFile);
+			const char *windowTitle, const BoyLib::UString &persFile, unsigned char *persFileKey);
 		void destroy();
 
 		// main loop related
@@ -88,6 +88,8 @@ namespace Boy
 		static void	playSound(Sound *sound, bool loop=false, float volume=1.0f);
 		static TriStrip *createTriStrip(int numVerts);
 
+		unsigned char *getCryptoKey();
+
 		void debugLog(const char *fmt, ...);
 	protected:
 		void update();
@@ -138,6 +140,8 @@ namespace Boy
 
 		GamePad *mGamePads[GAMEPAD_COUNT_MAX];
 		std::map<SDL_JoystickID,int> mInstanceIdToGamePadId;
+
+		unsigned char *mpCryptoKey;
 
 		FILE *mLogFile;
 	};

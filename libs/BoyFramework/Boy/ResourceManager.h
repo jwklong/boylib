@@ -21,11 +21,11 @@ namespace Boy
 	{
 	public:
 		
-		ResourceManager(ResourceLoader *loader);
+		ResourceManager(ResourceLoader *loader, unsigned char *key);
 		virtual ~ResourceManager();
 
 		// resource file parsing:
-		virtual bool parseResourceFile(const std::string &fileName);
+		virtual bool parseResourceFile(const std::string &fileName, unsigned char *key = NULL);
 
 		// resource loading/unloading:
 		virtual bool loadResourceGroup(const std::string &groupName);

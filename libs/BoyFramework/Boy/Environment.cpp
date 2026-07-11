@@ -65,15 +65,18 @@ void Environment::init(Boy::Game *game,
 					   int screenHeight, 
 					   bool fullscreen, 
 					   const char *windowTitle, 
-					   const BoyLib::UString &persFile)
+					   const BoyLib::UString &persFile,
+					   unsigned char *persFileKey)
 {
+	mpCryptoKey = persFileKey;
+
 	mGame = game;
 	mGraphics = new Graphics(screenWidth, screenHeight);
 	mStorage = new Storage();
 	mResourceLoader = new ResourceLoader();
-	mResourceManager = new ResourceManager(mResourceLoader);
+	mResourceManager = new ResourceManager(mResourceLoader, mpCryptoKey);
 	mSoundPlayer = new SoundPlayer();
-	mPersistenceLayer = new PersistenceLayer(persFile);
+	mPersistenceLayer = new PersistenceLayer(persFile, mpCryptoKey);
 
     if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER) == -1) { 
         printf("Could not initialize SDL: %s\n", SDL_GetError());
@@ -716,6 +719,11 @@ TriStrip *Environment::createTriStrip(int numVerts)
 {
 	TriStrip *strip = new TriStrip(numVerts);
 	return strip;
+}
+
+unsigned char *Environment::getCryptoKey()
+{
+	return mpCryptoKey;
 }
 
 void Environment::debugLog(const char *fmt, ...)

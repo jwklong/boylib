@@ -10,7 +10,7 @@ namespace Boy
 	{
 	public:
 
-		PersistenceLayer(const BoyLib::UString &filename);
+		PersistenceLayer(const BoyLib::UString &filename, unsigned char* key);
 		virtual ~PersistenceLayer();
 
 		virtual void putString(const std::string &name, const std::string &value, bool persist=false);
@@ -31,6 +31,7 @@ namespace Boy
 
 	private:
 
+		unsigned char *mKey;
 		std::map<std::string,std::string> mValues;
 		BoyLib::UString mFileName;
 

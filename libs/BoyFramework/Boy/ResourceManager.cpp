@@ -5,6 +5,7 @@
 #include "Environment.h"
 #include <fstream>
 #include <iostream>
+#include "Crypto.h"
 #include "Font.h"
 #include "Image.h"
 #include "Sound.h"
@@ -16,17 +17,46 @@
 
 using namespace Boy;
 
-ResourceManager::ResourceManager(ResourceLoader *loader)
+ResourceManager::ResourceManager(ResourceLoader *loader, unsigned char *key)
 {
     mResourceLoader = loader;
 }
 
 ResourceManager::~ResourceManager()
 {
+	// unload all resource groups:
+	std::map<std::string,ResourceGroup*>::iterator groupIter;
+	for (groupIter=mResourceGroups.begin() ; groupIter!=mResourceGroups.end() ; groupIter++)
+	{
+		unloadResourceGroup(groupIter->first);
+		delete groupIter->second;
+	}
+	mResourceGroups.clear();
 
+	// delete all resources:
+	std::map<std::string,Resource*>::iterator resIter;
+	for (resIter=mResourcesByPath.begin() ; resIter!=mResourcesByPath.end() ; resIter++)
+	{
+		assert(!resIter->second->isLoaded());
+
+		// if the resource is loaded (this will happen 
+		// when we call getImageFromPath directly):
+		while (resIter->second->isLoaded())
+		{
+			// unload it:
+			resIter->second->release();
+		}
+
+		delete resIter->second;
+	}
+	mResourcesByPath.clear();
+
+	// clear the rest of the data
+	mParsedResourceFiles.clear();
+	mResourcesById.clear();
 }
 
-bool ResourceManager::parseResourceFile(const std::string &fileName)
+bool ResourceManager::parseResourceFile(const std::string &fileName, unsigned char *key)
 {
 	// if we've already loaded the fonts:
 	if (find(mParsedResourceFiles.begin(),mParsedResourceFiles.end(),fileName) != mParsedResourceFiles.end())
@@ -37,11 +67,40 @@ bool ResourceManager::parseResourceFile(const std::string &fileName)
 
 	TiXmlDocument doc;
 
-    bool success = doc.LoadFile(fileName.c_str());
-    if (!success)
-    {
-        return false;
-    }
+	if (key==NULL)
+	{
+		bool success = doc.LoadFile(fileName.c_str());
+		if (!success)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		// adjust the filename to point to the encrypted version:
+		std::string encFileName = fileName;
+		if (key!=NULL)
+		{
+			encFileName.append(".bin");
+		}
+
+		// load and decrypt the resource file
+		char *data;
+		int dataSize;
+		bool success = Boy::loadDecrypt(key, encFileName.c_str(), &data, &dataSize);
+		if (!success)
+		{
+			return false;
+		}
+
+		// parse it:
+		doc.Parse(data);
+		mParsedResourceFiles.push_back(fileName);
+
+		// deallocate the mem:
+		delete[] data;
+		data = NULL;
+	}
 	
 	TiXmlElement *root = doc.RootElement();
 
