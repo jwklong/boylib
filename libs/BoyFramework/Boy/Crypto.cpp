@@ -39,18 +39,20 @@ void Boy::aesEncrypt(const unsigned char *key, const char *inData, int inDataSiz
 
 void Boy::aesDecrypt(const unsigned char *key, const char *inData, int inDataSize, char **outData, int *outDataSize)
 {
-	// allocate output data buffer:
-	*outDataSize = (inDataSize+15)&(~15); // round up
-	assert(*outDataSize==inDataSize);
-	*outData = new char[*outDataSize];
-
 	// if there's no key, we don't need to encrypt anything, simply copy:
 	if (key==NULL)
 	{
+		*outDataSize = inDataSize;
+		*outData = new char[*outDataSize];
 		memset(*outData,0,*outDataSize); // zero out the memory
 		memcpy(*outData,inData,inDataSize); // copy input data to output buffer
 		return;
 	}
+
+	// allocate output data buffer:
+	*outDataSize = (inDataSize+15)&(~15); // round up
+	assert(*outDataSize==inDataSize);
+	*outData = new char[*outDataSize];
 
 	// put input data in temporary buffer:
 	unsigned char *buf = new unsigned char[*outDataSize];
