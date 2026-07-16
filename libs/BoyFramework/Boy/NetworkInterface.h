@@ -15,7 +15,7 @@ namespace Boy
 		NetworkInterface() {}
 
         void httpQueueThreadProc();
-        int processHttpRequest(HttpRequest *request);
+        int processHttpRequest(HttpRequest *request, void *userp);
         void queueHttpRequest(HttpRequest *request);
         void sendHttpRequest(HttpRequest *request, HttpResponse *response);
         void setReplaceEnabled(const std::string &tag, bool enabled);
@@ -30,5 +30,7 @@ namespace Boy
         std::vector<std::string> mReplaceTags;
 	};
 
+    void curlWriteFunction(void *contents, unsigned int size, unsigned int nmemb, void *userp);
+    void httpQueueThreadProc(void *unknown1);
     void sendHttpRequest(HttpRequest *request, HttpResponse *response);
 }
