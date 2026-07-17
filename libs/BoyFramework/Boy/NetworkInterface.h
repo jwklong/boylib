@@ -19,7 +19,7 @@ namespace Boy
         void queueHttpRequest(HttpRequest *request);
         void sendHttpRequest(HttpRequest *request, HttpResponse *response);
         void setReplaceEnabled(const std::string &tag, bool enabled);
-        void upload(const std::string &unknown1, const std::string &unknown2, const std::string &unknown3);
+        void upload(const std::string &url, const std::string &filename, const std::string &content);
 
     protected:
         SDL_mutex *mRequestProcessingMutex;
