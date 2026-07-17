@@ -45,8 +45,5 @@ namespace BoyLib
 		Vector2 mPosRegister;
 		bool mInheritRotation;
 
-		// TODO: remove, this is for debugging only:
-		bool mIsRemapped;
-
 	};
 }
