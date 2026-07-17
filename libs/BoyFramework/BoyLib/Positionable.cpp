@@ -8,8 +8,7 @@ using namespace BoyLib;
 Positionable::Positionable() 
 { 
 	mAnchor=NULL; 
-	mAngle=0; 
-	mIsRemapped = false;
+	mAngle=0;
 	mInheritRotation = true;
 	mPosRegisterDirty = true;
 }
@@ -19,7 +18,6 @@ Positionable::Positionable(const Positionable &positionable)
 	mPos = positionable.mPos;
 	mAngle = positionable.mAngle;
 	mAnchor = positionable.mAnchor;
-	mIsRemapped = false;
 	mInheritRotation = positionable.mInheritRotation;
 	mPosRegisterDirty = true;
 }
@@ -80,9 +78,6 @@ Cloneable *Positionable::clone(std::map<Cloneable*,Cloneable*> *cloneMap)
 
 void Positionable::remap(std::map<Cloneable*,Cloneable*> &cloneMap)
 {
-	assert(!mIsRemapped);
-	mIsRemapped = true;
-
 	if (mAnchor!=NULL)
 	{
 		Positionable *ac = dynamic_cast<Positionable*>(cloneMap[mAnchor]);
