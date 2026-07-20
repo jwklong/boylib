@@ -9,6 +9,7 @@ namespace Boy
 	{
 	public:
 		HttpResponseHandler() {}
+		virtual ~HttpResponseHandler() {}
 
 		virtual void handleMessage(HttpRequest *request, HttpResponse *response) = 0;
 	};

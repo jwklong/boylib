@@ -7,7 +7,8 @@ namespace Boy
 	class HttpResponse
 	{
 	public:
-		HttpResponse() {}
+		HttpResponse();
+		virtual ~HttpResponse();
 
     public:
         std::string mBody;
