@@ -13,6 +13,7 @@
 #include "Game.h"
 #include "GamePad.h"
 #include "Graphics.h"
+#include "NetworkInterface.h"
 #include "ResourceLoader.h"
 #include "ResourceManager.h"
 #include "SoundPlayer.h"
@@ -77,6 +78,7 @@ void Environment::init(Boy::Game *game,
 	mResourceManager = new ResourceManager(mResourceLoader, mpCryptoKey);
 	mSoundPlayer = new SoundPlayer();
 	mPersistenceLayer = new PersistenceLayer(persFile, mpCryptoKey);
+	mNetworkInterface = new NetworkInterface();
 
     if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_GAMECONTROLLER) == -1) { 
         printf("Could not initialize SDL: %s\n", SDL_GetError());
@@ -174,6 +176,7 @@ void Environment::destroy()
 	}
 
 	delete mGraphics; mGraphics = NULL;
+	delete mNetworkInterface; mNetworkInterface = NULL;
 	delete mPersistenceLayer; mPersistenceLayer = NULL;
 	delete mResourceManager; mResourceManager = NULL;
 	delete mResourceLoader; mResourceLoader = NULL;
@@ -588,6 +591,10 @@ float Environment::getTime()
 Graphics *Environment::getGraphics()
 {
 	return mGraphics;
+}
+NetworkInterface *Environment::getNetworkInterface()
+{
+	return mNetworkInterface;
 }
 PersistenceLayer *Environment::getPersistenceLayer()
 {

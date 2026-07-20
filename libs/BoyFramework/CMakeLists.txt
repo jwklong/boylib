@@ -11,6 +11,7 @@ ${CMAKE_SOURCE_DIR}/libs/BoyFramework/Boy/)
 
 file(GLOB_RECURSE BOY_SOURCES "Boy/*.cpp")
 
+find_package(CURL REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_mixer REQUIRED)
@@ -24,9 +25,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if (WIN32)
-    target_link_libraries(BoyFramework PRIVATE SDL2::SDL2-static SDL2_image::SDL2_image-static SDL2_mixer::SDL2_mixer-static OpenGL::GL AES TinyXML)
+    target_link_libraries(BoyFramework PRIVATE CURL::libcurl SDL2::SDL2-static SDL2_image::SDL2_image-static SDL2_mixer::SDL2_mixer-static OpenGL::GL AES TinyXML)
+    target_compile_definitions(BoyFramework PRIVATE CURL_STATICLIB)
 else()
-    target_link_libraries(BoyFramework PRIVATE SDL2 SDL2_image SDL2_mixer OpenGL::GL AES TinyXML)
+    target_link_libraries(BoyFramework PRIVATE CURL::libcurl SDL2 SDL2_image SDL2_mixer OpenGL::GL AES TinyXML)
 endif()
 
 add_subdirectory(external)
