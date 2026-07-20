@@ -128,11 +128,11 @@ void NetworkInterface::httpQueueThreadProc()
 
 int NetworkInterface::processHttpRequest(HttpRequest *request)
 {
-    HttpResponse *response;
-    sendHttpRequest(request, response);
+    HttpResponse response;
+    sendHttpRequest(request, &response);
     if (request->mHandler != NULL)
     {
-        request->mHandler->handleMessage(request, response);
+        request->mHandler->handleMessage(request, &response);
     }
 
     return 0;
