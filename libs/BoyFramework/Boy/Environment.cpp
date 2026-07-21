@@ -405,7 +405,7 @@ bool Environment::isShuttingDown()
 
 void Environment::showError(const std::string &message)
 {
-	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"Message from World of Goo Corporation",message.c_str(),mWindow);
+	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,"Error",message.c_str(),mWindow);
 }
 
 bool Environment::isFullScreen()
