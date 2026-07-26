@@ -1,0 +1,16 @@
+# To Do
+- [ ] MMMem and MemDbg debug function
+- [ ] MD5 hashing function
+- [ ] Localization
+- [ ] Config.txt
+- [ ] Better Refresh Rate implementation
+- [ ] Mute for audio
+- [ ] ui_inset
+- [ ] Actual resizable window
+- [ ] Scene and Camera function
+- [ ] PhysBoy (Physics)
+- [ ] SDL3 port
+- [ ] SoLoud audio implementation
+- [ ] Debug features (IMGUI, debug stats, and profiling)
+- [ ] Optional: Demo rework, pause menu, unhardcoding variables.
+- [ ] Crash dialog
