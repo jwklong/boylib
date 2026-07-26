@@ -446,10 +446,13 @@ void Environment::setupGL()
 	int wW;
 	int wH;
 	SDL_GetWindowSize(mWindow, &wW, &wH);
-
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0.0, sW, sH, 0.0, 1.0, -1.0);
+
+	glClear(GL_COLOR_BUFFER_BIT);
+	SDL_GL_SwapWindow(mWindow);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	float screenAspect = (float)sW / (float)sH;
 	float windowAspect = (float)wW / (float)wH;
@@ -466,6 +469,7 @@ void Environment::setupGL()
 		vY = (wH - vH) / 2;
 	}
 	glViewport(vX, vY, vW, vH);
+	glScissor(vX, vY, vW, vH);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

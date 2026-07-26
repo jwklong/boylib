@@ -7,6 +7,7 @@
 #include "Font.h"
 #include "BoyLib/Vector2.h"
 #include "TriStrip.h"
+#include "Environment.h"
 
 using namespace Boy;
 
@@ -279,6 +280,7 @@ int Graphics::getTransformStackSize()
 
 void Graphics::setClipRect(int x, int y, int width, int height)
 {
+
     glScissor(x, y, width, height);
 }
 
