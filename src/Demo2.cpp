@@ -65,7 +65,7 @@ void Demo2::destroy()
 void Demo2::init()
 {
 	Boy::ResourceManager *rm = Boy::Environment::instance()->getResourceManager();
-	rm->parseResourceFile("res/resources.xml");
+	rm->parseResourceFile("res/properties/resources.xml");
 	rm->loadResourceGroup("common");
 	mShipImage = rm->getImage("IMAGE_SHIP");
 	mThrustImage = rm->getImage("IMAGE_THRUST");
