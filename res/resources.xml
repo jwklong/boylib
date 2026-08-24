@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<ResourceManifest>
+
+  <Resources id="common">
+
+    <image id="IMAGE_SHIP"               path="res/images/ship"/>
+    <image id="IMAGE_THRUST"             path="res/images/thruster"/>
+    <image id="IMAGE_BULLET"             path="res/images/bullet"/>
+
+    <image id="IMAGE_ASTEROID_BIG_1"     path="res/images/asteroids/asteroidb1"/>
+    <image id="IMAGE_ASTEROID_BIG_2"     path="res/images/asteroids/asteroidb2"/>
+    <image id="IMAGE_ASTEROID_BIG_3"     path="res/images/asteroids/asteroidb3"/>
+    <image id="IMAGE_ASTEROID_MEDIUM_1"  path="res/images/asteroids/asteroidm1"/>
+    <image id="IMAGE_ASTEROID_MEDIUM_2"  path="res/images/asteroids/asteroidm2"/>
+    <image id="IMAGE_ASTEROID_MEDIUM_3"  path="res/images/asteroids/asteroidm3"/>
+    <image id="IMAGE_ASTEROID_SMALL_1"   path="res/images/asteroids/asteroids1"/>
+    <image id="IMAGE_ASTEROID_SMALL_2"   path="res/images/asteroids/asteroids2"/>
+    <image id="IMAGE_ASTEROID_SMALL_3"   path="res/images/asteroids/asteroids3"/>
+
+    <font  id="FONT_MAIN"                path="res/fonts/Stick72Bold"/>
+
+    <sound id="SOUND_FIRE"               path="res/sounds/fire"/>
+    <sound id="SOUND_BOOM"               path="res/sounds/boom"/>
+    <sound id="SOUND_THRUST"             path="res/sounds/thrust"/>
+
+  </Resources>
+
+</ResourceManifest>
