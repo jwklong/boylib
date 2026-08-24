@@ -3,6 +3,7 @@
 #include "GL/gl.h"
 #include <iostream>
 #include <algorithm>
+#include "Environment.h"
 #include "Image.h"
 #include "Font.h"
 #include "BoyLib/Vector2.h"
@@ -29,6 +30,12 @@ Graphics::~Graphics()
 
 void Graphics::drawImage(Image *img, int subrectX, int subrectY, int subrectW, int subrectH)
 {
+    if (img == NULL)
+    {
+        envDebugLog("WARNING: trying to draw image with NULL texture");
+        return;
+    }
+
 	GLuint textureID = img->getTextureId();
     glBindTexture(GL_TEXTURE_2D, textureID); // bind
 
